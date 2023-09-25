@@ -9,8 +9,20 @@ provider:
 
 functions:
   api:
-    handler: index.handler
+    handler: api/index.handler
     events:
       - httpApi:
           path: /
           method: get
+  send:
+    handler: api/index.send
+    events:
+      - httpApi:
+          path: /
+          method: post
+          request:
+            schemas:
+              application/json: ${file(./schemas/get-answer-request.json)}
+
+plugins:
+  - serverless-offline
