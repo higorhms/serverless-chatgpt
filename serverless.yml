@@ -8,6 +8,9 @@ params:
     dbName: serverless-chatgpt
   dev:
     connectionString: mongodb://localhost:27017/${self:params.default.dbName}
+    salt: 6d9c28d5-a4ec-46e0-bb96-83bfaac9b9e7
+    jwtSecret: 8e0f0023-5cfc-4701-94ad-4b6f4d26895d
+  prod:
 
 provider:
   name: aws
@@ -15,23 +18,34 @@ provider:
   environment:
     MONGODB_CONNECTION_STRING: ${param:connectionString}
     MONGODB_DB_NAME: ${param:dbName}
+    SALT: ${param:salt}
+    JWT_SECRET: ${param:jwtSecret}
 
 functions:
   api:
     handler: api/index.handler
     events:
       - httpApi:
-          path: /
+          path: /api/
           method: get
   send:
     handler: api/index.send
     events:
       - httpApi:
-          path: /
+          path: /api/
           method: post
           request:
             schemas:
               application/json: ${file(./schemas/get-answer-request.json)}
+  login:
+    handler: api/index.login
+    events:
+      - httpApi:
+          path: /api/login
+          method: post
+          request:
+            schemas:
+              application/json: ${file(./schemas/login-request.json)}
 
 plugins:
   - serverless-offline
