@@ -1,22 +1,17 @@
 const { verify } = require("jsonwebtoken");
+const { buildResponse } = require("../../api/utils");
 
 module.exports.authorize = (event) => {
   const { authorization } = event.headers;
 
   if (!authorization) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: 'Unauthorized' })
-    }
+    return buildResponse(401, { error: 'Unauthorized' })
   }
 
   const [type, token] = authorization.split(' ');
 
   if (type !== 'Bearer') {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: 'Unauthorized' })
-    }
+    return buildResponse(401, { error: 'Unauthorized' })
   }
 
   try {
@@ -24,11 +19,6 @@ module.exports.authorize = (event) => {
 
     return decodedToken;
   } catch (err) {
-    console.error('Token verification failed:', err.message);
-
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: 'Unauthorized' })
-    }
+    return buildResponse(401, { error: 'Unauthorized' })
   }
 }
