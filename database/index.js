@@ -27,4 +27,18 @@ async function saveResultsToDatabase(results) {
   return result;
 }
 
-module.exports = { connectToDatabase, getUserByCredentials, saveResultsToDatabase }
+async function saveUser(user) {
+  const client = await connectToDatabase();
+  const collection = await client.collection('users');
+  const foundUser = await getUserByCredentials(user.username, user.password);
+  if(foundUser) throw new Error(`${foundUser.username} is already registered.`)
+  const result = await collection.insertOne(user);
+  return result;
+}
+
+module.exports = {
+  connectToDatabase,
+  getUserByCredentials,
+  saveResultsToDatabase,
+  saveUser
+}

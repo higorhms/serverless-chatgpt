@@ -28,17 +28,8 @@ functions:
       - httpApi:
           path: /api/
           method: get
-  send:
-    handler: api/index.send
-    events:
-      - httpApi:
-          path: /api/
-          method: post
-          request:
-            schemas:
-              application/json: ${file(./schemas/get-answer-request.json)}
   login:
-    handler: api/index.login
+    handler: api/auth.login
     events:
       - httpApi:
           path: /api/login
@@ -46,6 +37,21 @@ functions:
           request:
             schemas:
               application/json: ${file(./schemas/login-request.json)}
+  batchUserRegistration:
+    handler: api/batch.batchUserRegistration
+    events:
+      - s3:
+          bucket: users-csv-local
+          event: s3:ObjectCreated:*
+          rules:
+            - suffix: .csv
+  csvUpload:
+    handler: api/batch.csvUpload
+    events:
+      - httpApi:
+          path: /api/users/batch
+          method: post
 
 plugins:
   - serverless-offline
+  - serverless-s3-local
